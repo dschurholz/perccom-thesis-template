@@ -1,0 +1,156 @@
+% Daniel Schurholz, modified version from Jouni Ritvanen's doctoral version
+%
+% Compile to pdf, run at command prompt:
+% latex main
+% makeindex main.nlo -s nomencl.ist -o main.nls
+% bibtex main
+% latex main
+% latex main
+% dvipdfm main.dvi
+
+\documentclass[a4paper,twoside,12pt,notitlepage,openright]{article}
+\usepackage[ansinew]{inputenc}
+\usepackage{graphicx} %[dvips] to used with .eps figures
+\usepackage{natbib}
+\usepackage{lastpage}   % page count
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[english]{babel}
+\usepackage[intoc]{nomencl} % including table of content
+\usepackage{ifthen}
+\usepackage[hmargin=3.0cm,vmargin=3.6cm]{geometry} % setting marginals
+\usepackage{fancyhdr}  % header ja footer manipulation
+\usepackage{times}  % to change font to times
+\usepackage{setspace} % for linespacing
+\usepackage{xstring}
+\usepackage{tabularx}
+\usepackage{etoolbox}
+
+\pretocmd{\chapter}{\addtocounter{totfigures}{\value{figure}}\setcounter{figure}{0}}{}{}
+\pretocmd{\chapter}{\addtocounter{tottables}{\value{table}}\setcounter{table}{0}}{}{}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\newcommand{\nomunit}[1]{\renewcommand{\nomentryend}{\hspace*{\fill}#1}} % Inserts units on the right at symbol list
+\renewcommand{\nomgroup}[1]{%
+ \ifthenelse{\equal{#1}{C}}{\item[\textbf{Latin alphabet}]\item}{%
+ \ifthenelse{\equal{#1}{G}}{\item\item[\textbf{Greek alphabet}]\item}{}}{%
+ \ifthenelse{\equal{#1}{L}}{\item\item[\textbf{Subscripts}]\item}{}}{%
+ \ifthenelse{\equal{#1}{H}}{\item\item[\textbf{Superscripts}]\item}{}}{%
+ \ifthenelse{\equal{#1}{W}}{\item\item[\textbf{Abbreviations}]\item}{}}{}}
+
+\onehalfspacing
+
+\pagestyle{fancy}
+
+%% FANCY FOOTER
+\fancyhf{}% clearing the header and footer
+\renewcommand{\headrulewidth}{0pt}
+\cfoot{\bfseries\thepage}
+%%
+
+%% FANCY HEADER
+% For page number in header + section name, uncomment next 10 lines and comment previous 3 lines
+% \fancyhf{}
+% \fancyhead[LE,RO]{\bfseries\thepage}    % page number to header
+% \fancyhead[LO]{\nouppercase{\bfseries\rightmark}}     %
+% \fancyhead[RE]{\nouppercase{\bfseries\leftmark}}%
+% \renewcommand\sectionmark[1]
+%  {\markboth{\thesection\ #1}{}}         % section name to header
+% \renewcommand\subsectionmark[1]
+%  {\markright{\thesubsection\ #1}}       % subsection name to header
+% \renewcommand{\headrulewidth}{0.5pt}    % ruler thickness between head and body
+% \renewcommand{\footrulewidth}{0pt}      % no ruler between body and footer
+%%
+
+\setlength{\nomitemsep}{-\parsep}   % removing default extra skip between entries at nomenclature
+
+\numberwithin{equation}{section}    % equation numbers with section numbers
+\numberwithin{table}{section}       % table numbers with section numbers
+\numberwithin{figure}{section}      % figure numbers with section numbers
+
+% makeindex command needs to run at command prompt to create nomenclature list file
+\makenomenclature % makeindex main.nlo -s nomencl.ist -o main.nls
+%\bibpunct{(}{)}{;}{a}{,}{,}%
+\AtBeginDocument{%
+    \renewcommand\contentsname{TABLE OF CONTENTS}
+    \renewcommand\nomname{LIST OF SYMBOLS AND ABBREVIATIONS}
+    \renewcommand*\listfigurename{LIST OF FIGURES}
+    \renewcommand*\listtablename{LIST OF TABLES}
+}
+
+\newcounter{totfigures}
+\newcounter{tottables}
+
+\providecommand\totfig{} 
+\providecommand\tottab{}
+
+\makeatletter
+\AtEndDocument{%
+  \addtocounter{totfigures}{\value{figure}}%
+  \addtocounter{tottables}{\value{table}}%
+  \immediate\write\@mainaux{%
+    \string\gdef\string\totfig{\number\value{totfigures}}%
+    \string\gdef\string\tottab{\number\value{tottables}}%
+  }%
+}
+\makeatother
+
+\pretocmd{\section}{\addtocounter{totfigures}{\value{figure}}\setcounter{figure}{0}}{}{}
+\pretocmd{\section}{\addtocounter{tottables}{\value{table}}\setcounter{table}{0}}{}{}
+
+\begin{document}
+
+\pagestyle{empty}
+\include{constants}
+\include{nimio}
+\normalsize
+\include{abstract}
+\addtocontents{toc}{\contentsline {section}{ABSTRACT}{}}
+
+\include{acknowledgments}
+\addtocontents{toc}{\contentsline {section}{ACKNOWLEDGMENTS}{}}%
+\addtocontents{toc}{\contentsline {section}{TABLE OF CONTENTS}{}}%
+\addtocontents{toc}{\contentsline{section}{LIST OF FIGURES}{}}
+\addtocontents{toc}{\contentsline{section}{LIST OF TABLES}{}}
+
+\tableofcontents%
+\thispagestyle{empty}%
+\clearpage%
+\listoffigures
+\thispagestyle{empty}%
+\clearpage%
+\thispagestyle{empty}%
+\listoftables
+\thispagestyle{empty}%
+\clearpage%
+\pagestyle{fancy}%
+
+\thispagestyle{empty}%
+\cleardoublepage%
+\printnomenclature[2.0cm]%
+
+\setlength{\parskip}{\baselineskip}%
+\include{introduction} %Introduction
+\include{thesis} %Thesis
+\include{results} %Results
+\include{conclusions} %Conclusions
+
+%\def\refname{what ever}% to change References title
+\addcontentsline{toc}{section}{REFERENCES}%
+
+\appendix
+% Uncomment if page number in header
+% \fancyhead[LO]{}     %
+% \fancyhead[RE]{}%
+\section*{APPENDICES}\label{sec:appendices}
+\addcontentsline{toc}{section}{APPENDICES}
+\renewcommand{\thesubsection}{APPENDIX \arabic{subsection}.}
+\include{appendices}
+
+\bibliography{ref}%
+\bibliographystyle{LUTapa}%
+
+\cleardoublepage %
+
+\end{document}

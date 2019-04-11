@@ -1,0 +1,49 @@
+\newcommand{\thesisAuthor}{Your Name}
+\newcommand{\thesisTitle}{Your Thesis Title}
+
+% The Participating Universities
+\newcommand{\universities}{Universit\'{e} de Lorraine\\
+Lappeenranta University of Technology\\
+Lule\r{a} University of Technology\\}
+
+% Your supervisors in the order that you want them printed, just add or remove lines and change the indexes if needed.
+\newcommand{\supervisors}[1]{
+    \IfEqCase{#1}{
+        {0}{Supervisor 1}
+        {1}{Supervisor 2}
+        {2}{Supervisor 3}
+    }[\PackageError{constants}{Undefined option to supervisors: #1}{}]%
+}
+
+% Your examiners in the order that you want them printed, just add or remove lines and change the indexes if needed.
+\newcommand{\examiners}[1]{
+    \IfEqCase{#1}{
+        {0}{Prof. Eric Rondeau}
+        {1}{Prof. Jari Porras}
+        {2}{Prof. Karl Andersson}
+    }[\PackageError{constants}{Undefined option to examiners: #1}{}]%
+}
+
+% Your keywords in the order that you want them printed, just add or remove lines and change the indexes if needed.
+\newcommand{\keywords}[1]{
+    \IfEqCase{#1}{
+        {0}{this}
+        {1}{are}
+        {2}{very}
+        {3}{awesome}
+        {4}{keywords}
+    }[\PackageError{constants}{Undefined option to keywords: #1}{}]%
+}
+
+\newcommand{\keywordList}[2]{
+    \newcount\idx
+    \newcount\lastEl
+    \idx=0
+    \lastEl=#1
+    \advance \lastEl-1
+    \loop
+        \keywords{\the\idx}\ifnum \idx<\lastEl#2\fi
+    \advance \idx+1
+    \ifnum \idx<#1
+    \repeat
+}
